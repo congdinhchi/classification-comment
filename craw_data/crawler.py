@@ -8,48 +8,47 @@ from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 from time import sleep
 
-import csv
-
 class craigslist_crawler(object):
     def __init__(self, url):
         self.url = url
         self.browser = webdriver.Chrome("./chromedriver")
 
     def load_page(self,name):
-        name = name + '.csv'
-        with open(name, 'w', encoding='UTF8', newline='') as f:
-            writer = csv.writer(f)    
-            #mo trang web
-            browser = self.browser
-            browser.get(self.url)
-            sleep(1)
+        name = name + '.txt'
+        file_data = open(name, "a") 
+        #mo trang web
+        browser = self.browser
+        browser.get(self.url)
+        sleep(1)
 
-            #mo cac comment
-            comment_links = browser.find_element_by_xpath("/html/body/div[1]/div/div[2]/div[1]/div/div[2]/div/div[3]/div[2]/div[1]/div[2]/div/div[2]/div[2]/div[7]")
-            comment_links.click()
-            title = comment_links.text
-            title = title.split("(")[1]
-            num_comment = int(title.split(")")[0])
-            sleep(1)
+        #mo cac comment
+        comment_links = browser.find_element_by_xpath("/html/body/div[1]/div/div[2]/div[1]/div/div[2]/div/div[3]/div[2]/div[1]/div[2]/div/div[2]/div[2]/div[7]")
+        comment_links.click()
+        title = comment_links.text
+        title = title.split("(")[1]
+        num_comment = int(title.split(")")[0])
+        sleep(1)
 
-            i = 0 
+        i = 0 
 
-            while(i<num_comment):
+        while(i<num_comment):
 
-                if(i != 0):
-                    next_button = browser.find_element_by_xpath("//button[@class='shopee-icon-button shopee-icon-button--right ']")
-                    next_button.click()
-                    sleep(1)
+            if(i != 0):
+                next_button = browser.find_element_by_xpath("//button[@class='shopee-icon-button shopee-icon-button--right ']")
+                next_button.click()
+                sleep(1)
 
 
-                commnent_list = browser.find_elements_by_xpath("//div[@class='shopee-product-rating__main']")
-                for comment in commnent_list:
-                    i = i+1
-                    stars = comment.find_elements_by_css_selector('.icon-rating-solid')
-                    content_list = comment.find_element_by_class_name("Em3Qhp")
-                    writer.writerow([len(stars), content_list.text])
-                    print(i)
-            browser.close()                    
+            commnent_list = browser.find_elements_by_xpath("//div[@class='shopee-product-rating__main']")
+            for comment in commnent_list:
+                i = i+1
+                stars = comment.find_elements_by_css_selector('.icon-rating-solid')
+                content_list = comment.find_element_by_class_name("Em3Qhp")
+                file_data.write(len(stars), content_list.text)
+                print(i)
+
+        file_data.close()
+        browser.close()                    
         
 
 if __name__ == "__main__":
@@ -87,3 +86,4 @@ if __name__ == "__main__":
             print("----------Het trang {} -------------".format(i))
         except:
             continue
+
